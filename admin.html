@@ -3,185 +3,291 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin - Manage Signals</title>
+  <title>Admin Panel - Forex Signals</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/feather-icons"></script>
 </head>
-<body class="bg-gray-900 text-white p-6 min-h-screen">
-  <h1 class="text-3xl font-bold mb-6 text-center">📊 Admin Dashboard - Manage Signals</h1>
+<body class="bg-gradient-to-br from-gray-900 to-gray-800 text-white min-h-screen p-6">
 
-  <form id="signalForm" class="space-y-4 max-w-xl mx-auto mb-10">
-    <input type="hidden" id="signalId" />
-    <input type="text" id="pair" placeholder="Pair (e.g. EURUSD)" class="w-full p-3 bg-gray-700 rounded" required />
-    <input type="text" id="entry" placeholder="Entry" class="w-full p-3 bg-gray-700 rounded" required />
-    <input type="text" id="stopLoss" placeholder="Stop Loss" class="w-full p-3 bg-gray-700 rounded" required />
-    <input type="text" id="takeProfit" placeholder="Take Profit" class="w-full p-3 bg-gray-700 rounded" required />
-
-    <!-- Status dropdown -->
-    <select id="status" class="w-full p-3 bg-gray-700 rounded" required>
-      <option value="">Select Status</option>
-      <option value="BUY">BUY</option>
-      <option value="SELL">SELL</option>
-      <option value="PENDING">PENDING</option>
-    </select>
-
-    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 p-3 rounded font-bold">📤 Submit Signal</button>
-    <div id="statusText" class="text-center text-sm mt-2"></div>
-  </form>
-
-  <!-- Signal Table -->
-  <div class="overflow-x-auto">
-    <table class="w-full text-left border-collapse table-auto text-sm bg-gray-800 rounded-lg shadow-md">
-      <thead>
-        <tr class="bg-gray-700 text-white">
-          <th class="p-3">Pair</th>
-          <th class="p-3">Entry</th>
-          <th class="p-3">Stop Loss</th>
-          <th class="p-3">Take Profit</th>
-          <th class="p-3">Status</th>
-          <th class="p-3">Actions</th>
-        </tr>
-      </thead>
-      <tbody id="signalList" class="divide-y divide-gray-700"></tbody>
-    </table>
+  <!-- Loading -->
+  <div id="loadingScreen" class="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 z-50">
+    <div>
+      <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-white mx-auto mb-4"></div>
+      <p class="text-xl">Verifying authentication...</p>
+    </div>
   </div>
 
-<script>
-  const supabase = window.supabase.createClient(
-    "https://addgnnpugkwfhznmegfb.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkZGdubnB1Z2t3Zmh6bm1lZ2ZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NjEyMTMsImV4cCI6MjA2ODUzNzIxM30.rWwuSAPWhxm-7Ju4CkGzGiFbbOhzzlqFCV4gGTa2DII"
-  );
+  <!-- Login Modal -->
+  <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 hidden">
+      <!-- Back Button -->
+<button 
+  onclick="history.back()" 
+  class="fixed top-4 left-4 z-50 flex items-center gap-2 
+         bg-gradient-to-r from-gray-700 to-gray-800 
+         text-white px-5 py-2 rounded-full shadow-md hover:shadow-xl 
+         hover:from-gray-600 hover:to-gray-700 transition duration-200"
+>
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+  </svg>
+  Back
+</button>
+    <div class="bg-gray-900 p-8 rounded-lg shadow-xl w-full max-w-md">
+      <h2 class="text-2xl font-bold text-white text-center mb-4">🔐 Admin Login</h2>
+      <form id="authForm" class="space-y-4">
+        <input type="email" id="email" placeholder="Email" required class="w-full px-4 py-3 rounded bg-gray-800 text-white focus:outline-none">
+        <input type="password" id="password" placeholder="Password" required class="w-full px-4 py-3 rounded bg-gray-800 text-white focus:outline-none">
+        <label class="inline-flex items-center text-sm text-gray-300">
+          <input type="checkbox" id="rememberMe" class="mr-2"> Remember me
+        </label>
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded text-white font-bold">
+          Login
+        </button>
+      </form>
+    </div>
+  </div>
 
-  const form = document.getElementById("signalForm");
-  const signalList = document.getElementById("signalList");
-  const statusText = document.getElementById("statusText");
+  <!-- Admin Dashboard -->
+  <div id="adminContent" class="max-w-4xl mx-auto hidden space-y-8">
 
-  // ✅ Load and display signals
-  async function loadSignals() {
-    const { data, error } = await supabase
-      .from("signals")
-      .select("*")
-      .order("created_at", { ascending: false });
+    <div class="flex justify-between items-center">
+      <h1 class="text-3xl font-bold">🛠️ Admin Panel</h1>
+      <button id="logoutBtn" class="flex items-center bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white font-semibold px-5 py-2 rounded-full shadow-lg transition hover:scale-105">
+        <i data-feather="log-out" class="w-4 h-4 mr-2"></i> Logout
+      </button>
+    </div>
 
-    signalList.innerHTML = "";
+    <!-- Signal Form -->
+    <div id="signalForm" class="bg-gray-900 p-6 rounded-lg shadow-lg">
+        
+      <h2 class="text-xl font-bold mb-4">📤 Post / Edit Signal</h2>
+      <form id="postSignalForm" class="grid md:grid-cols-2 gap-4">
+        <input type="hidden" id="signalId">
+        <input type="text" id="pair" placeholder="Currency Pair (e.g. EUR/USD)" required class="bg-gray-800 p-3 rounded">
+        <input type="text" id="entry" placeholder="Entry Price" required class="bg-gray-800 p-3 rounded">
+        
+        <input type="text" id="stop_loss" placeholder="Stop Loss" required class="bg-gray-800 p-3 rounded">
+        
+        <input type="text" id="take_profit" placeholder="Take Profit" required class="bg-gray-800 p-3 rounded">
+        <select id="status" required class="bg-gray-800 p-3 rounded">
+          <option value="BUY">BUY</option>
+          <option value="SELL">SELL</option>
+          <option value="PENDING">PENDING</option>
+        </select>
+        <button type="submit" class="md:col-span-2 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded font-bold">
+          Submit
+        </button>
+        <br>
+        <hr>
+        <br>
+        
+        <!-- Signal List -->
+<div id="adminSignalList" class="space-y-4"></div>
+      </form>
+    </div>
 
-    if (error) {
-      console.error("❌ Load Error:", error.message);
-      return;
-    }
+   
+  </div>
 
-    data.forEach(signal => {
-      const badgeColor = {
-        BUY: "bg-green-600",
-        SELL: "bg-red-600",
-        PENDING: "bg-yellow-500"
-      }[signal.status] || "bg-gray-500";
+  <script>
+    const client = supabase.createClient(
+      "https://addgnnpugkwfhznmegfb.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkZGdubnB1Z2t3Zmh6bm1lZ2ZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NjEyMTMsImV4cCI6MjA2ODUzNzIxM30.rWwuSAPWhxm-7Ju4CkGzGiFbbOhzzlqFCV4gGTa2DII"
+    );
+    const ADMIN_EMAIL = "chibuikeedomani@gmail.com"; // Change to your admin
 
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td class="p-3 font-bold">${signal.pair}</td>
-        <td class="p-3">${signal.entry}</td>
-        <td class="p-3">${signal.stop_loss}</td>
-        <td class="p-3">${signal.take_profit}</td>
-        <td class="p-3">
-          <span class="px-2 py-1 text-xs rounded-full font-semibold ${badgeColor}">${signal.status || 'N/A'}</span>
-        </td>
-        <td class="p-3 space-x-2">
-          <button class="edit-btn bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded" data-id="${signal.id}">Edit</button>
-          <button class="delete-btn bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded" data-id="${signal.id}">Delete</button>
-        </td>
-      `;
+    let sessionInterval;
+    const loading = document.getElementById("loadingScreen");
+    const loginModal = document.getElementById("loginModal");
+    const adminContent = document.getElementById("adminContent");
+    const authForm = document.getElementById("authForm");
 
-      signalList.prepend(row);
+    authForm.addEventListener("submit", async e => {
+  e.preventDefault();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const remember = document.getElementById("rememberMe").checked;
 
-      // ✅ Attach listeners
-      row.querySelector(".edit-btn").addEventListener("click", (e) => {
-        const id = e.target.getAttribute("data-id");
-        editSignal(id);
-      });
+  const res = await client.auth.signInWithPassword({ email, password });
 
-      row.querySelector(".delete-btn").addEventListener("click", (e) => {
-        const id = e.target.getAttribute("data-id");
-        deleteSignal(id);
-      });
+  if (res.error) return alert("Login error: " + res.error.message);
+
+  const userEmail = res.data.user?.email;
+  if (userEmail !== ADMIN_EMAIL) {
+    await client.auth.signOut();
+    return alert("❌ Not authorized");
+  }
+
+  if (remember) localStorage.setItem("rememberUser", "true");
+  showAdmin();
+});
+
+    client.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT") {
+        localStorage.removeItem("rememberUser");
+        showLogin();
+      }
     });
+
+    async function checkAuth() {
+      const { data: { session } } = await client.auth.getSession();
+      if (!session?.user || session.user.email !== ADMIN_EMAIL) {
+        showLogin();
+        return false;
+      }
+      return true;
+    }
+
+    function showLogin() {
+      loading.classList.add("hidden");
+      adminContent.classList.add("hidden");
+      loginModal.classList.remove("hidden");
+    }
+    function showAdmin() {
+      loading.classList.add("hidden");
+      loginModal.classList.add("hidden");
+      adminContent.classList.remove("hidden");
+      initAdmin();
+    }
+
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      await client.auth.signOut();
+      clearInterval(sessionInterval);
+      window.location.reload();
+    });
+
+    document.addEventListener("DOMContentLoaded", async () => {
+  feather.replace();
+  const ok = await checkAuth();
+  if (ok) {
+    showAdmin();
+  } else {
+    showLogin(); // 👈 ensure login appears when user is not authenticated
+  }
+});
+
+    // 👨‍💼 ADMIN FUNCTIONALITY
+    async function initAdmin() {
+      sessionInterval = setInterval(checkAuth, 300000); // 5min
+
+      // Signals CRUD
+      const form = document.getElementById("postSignalForm");
+      const list = document.getElementById("adminSignalList");
+
+      form.onsubmit = async e => {
+        e.preventDefault();
+        const id = document.getElementById("signalId").value;
+        const payload = {
+          pair: form.pair.value,
+          entry: form.entry.value,
+          stop_loss: form.stop_loss.value,
+          take_profit: form.take_profit.value,
+          status: form.status.value
+        };
+        if (id) {
+          await client.from("signals").update(payload).eq("id", id);
+        } else {
+          await client.from("signals").insert(payload);
+        }
+        form.reset(); document.getElementById("signalId").value="";
+        loadSignals();
+      };
+
+async function loadSignals() {
+  const { data, error } = await client
+    .from("signals")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error loading signals:", error.message);
+    return;
   }
 
-  // ✅ Handle form submit (Create or Update)
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  list.innerHTML = "";
+  const now = new Date();
 
-    const id = document.getElementById("signalId").value;
-    const pair = document.getElementById("pair").value.trim();
-    const entry = document.getElementById("entry").value.trim();
-    const stop_loss = document.getElementById("stopLoss").value.trim();
-    const take_profit = document.getElementById("takeProfit").value.trim();
-    const status = document.getElementById("status").value.trim();
+  data.forEach(s => {
+   const createdAt = new Date(s.created_at);
+const now = new Date();
+const diffMins = Math.floor((now - createdAt) / 60000);
 
-    let response;
-    if (id) {
-      response = await supabase
-        .from("signals")
-        .update({ pair, entry, stop_loss, take_profit, status })
-        .eq("id", id);
-    } else {
-      response = await supabase
-        .from("signals")
-        .insert([{ pair, entry, stop_loss, take_profit, status }]);
-    }
-
-    const { error } = response;
-    if (error) {
-      statusText.textContent = "❌ Failed: " + error.message;
-      statusText.className = "text-red-400 text-center";
-    } else {
-      statusText.textContent = "✅ Signal saved successfully!";
-      statusText.className = "text-green-400 text-center";
-      form.reset();
-      document.getElementById("signalId").value = "";
-      loadSignals();
-    }
-  });
-
-  // ✅ Delete signal
- async function deleteSignal(id) {
-  if (confirm("Are you sure you want to delete this signal?")) {
-    const { error } = await supabase
-      .from("signals")
-      .delete()
-      .eq("id", id);
-
-    if (error) {
-      alert("❌ Delete failed: " + error.message);
-    } else {
-      loadSignals(); // reload updated signals
-    }
-  }
+// Relative time (e.g., "5 mins ago", "2 hours ago")
+let timeAgo = "Just now";
+if (diffMins < 1) {
+  timeAgo = "Just now";
+} else if (diffMins < 60) {
+  timeAgo = `${diffMins} min${diffMins > 1 ? 's' : ''} ago`;
+} else if (diffMins < 1440) { // Less than a day
+  const hours = Math.floor(diffMins / 60);
+  timeAgo = `${hours} hour${hours > 1 ? 's' : ''} ago`;
+} else {
+  const days = Math.floor(diffMins / 1440);
+  timeAgo = `${days} day${days > 1 ? 's' : ''} ago`;
 }
 
-  // ✅ Edit signal
-  async function editSignal(id) {
-    const { data, error } = await supabase
-      .from("signals")
-      .select("*")
-      .eq("id", id)
-      .single();
+// Format exact date (e.g., "Jul 20, 2025 at 2:15 PM")
+const options = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' };
+const exactDate = createdAt.toLocaleString(undefined, options);
 
-    if (data) {
-      document.getElementById("signalId").value = data.id;
-      document.getElementById("pair").value = data.pair;
-      document.getElementById("entry").value = data.entry;
-      document.getElementById("stopLoss").value = data.stop_loss;
-      document.getElementById("takeProfit").value = data.take_profit;
-      document.getElementById("status").value = data.status;
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } else {
-      console.error("Edit fetch failed:", error?.message);
-    }
-  }
+    let badgeColor = "bg-gray-600";
+    if (s.status === "BUY") badgeColor = "bg-green-600";
+    else if (s.status === "SELL") badgeColor = "bg-red-600";
+    else if (s.status === "PENDING") badgeColor = "bg-yellow-400 text-black";
 
-  // ✅ Load signals on page load
-  loadSignals();
-</script>
+    const div = document.createElement("div");
+    div.className = "bg-gray-800 p-4 rounded shadow-lg";
+
+    div.innerHTML = `
+      <div class="flex justify-between items-center mb-2">
+        <div>
+          <h3 class="font-bold text-lg">${s.pair}</h3>
+          <span class="text-sm text-gray-400">📅 ${timeAgo}</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <span class="text-xs px-3 py-1 rounded-full font-semibold ${badgeColor}">${s.status}</span>
+          <button type="button" data-id="${s.id}" class="edit-btn text-yellow-400 hover:underline">Edit</button>
+          <button type="button" data-id="${s.id}" class="delete-btn text-red-500 hover:underline">Delete</button>
+        </div>
+      </div>
+      <div class="text-sm space-y-1">
+        <p>🎯 <strong>Entry:</strong> ${s.entry}</p>
+        <p>🛑 <strong>Stop Loss:</strong> ${s.stop_loss}</p>
+        <p>✅ <strong>Take Profit:</strong> ${s.take_profit}</p>
+        <p class="text-xs text-gray-400 mt-1">⏱ ${timeAgo} (on ${exactDate})</p>
+      </div>
+    `;
+
+    list.appendChild(div);
+  });
+
+  list.querySelectorAll(".edit-btn").forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.dataset.id;
+      const sig = data.find(si => si.id == id);
+      document.getElementById("signalId").value = sig.id;
+      document.getElementById("pair").value = sig.pair;
+      document.getElementById("entry").value = sig.entry;
+      document.getElementById("stop_loss").value = sig.stop_loss;
+      document.getElementById("take_profit").value = sig.take_profit;
+      form.status.value = sig.status;
+    };
+  });
+
+  list.querySelectorAll(".delete-btn").forEach(btn => {
+    btn.onclick = async () => {
+      if (confirm("Delete this signal?")) {
+        await client.from("signals").delete().eq("id", btn.dataset.id);
+        loadSignals();
+      }
+    };
+  });
+}
+     
+
+      await loadSignals();
+      }
+  </script>
 </body>
 </html>

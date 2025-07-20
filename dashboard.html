@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Forex Signals Dashboard</title>
+  <title>Secure Forex Signals Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
@@ -11,118 +11,302 @@
 </head>
 <body class="bg-gradient-to-br from-blue-900 to-indigo-900 min-h-screen text-white p-6">
     
-  <div class="max-w-6xl mx-auto">
-      
-    <div class="flex justify-between items-center mb-8"> 
-      <h1 class="text-3xl font-bold">📉📈 FOCUS SIGNALS</h1>
-      <button id="logoutBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold px-2 py-2 rounded">
-        Logout
-      </button>
+  <!-- Loading Screen -->
+  <div id="loadingScreen" class="fixed inset-0 bg-gradient-to-br from-blue-900 to-indigo-900 flex items-center justify-center z-50">
+    <div class="text-center">
+      <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-white mx-auto mb-4"></div>
+      <p class="text-xl">Verifying authentication...</p>
     </div>
-    <hr><br>
+  </div>
+
+  <!-- Login Required Modal -->
+  <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+    <div class="bg-gray-800 p-8 rounded-lg shadow-xl max-w-md w-full mx-4">
+      <div class="text-center">
+        <div class="text-red-500 text-6xl mb-4">🔒</div>
+        <h2 class="text-2xl font-bold mb-4">Access Denied</h2>
+        <p class="text-gray-300 mb-6">You must be logged in to access this dashboard.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login Form -->
+  <div id="loginForm" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 hidden">
+      <!-- Back Button -->
+<button 
+  onclick="history.back()" 
+  class="fixed top-4 left-4 z-50 flex items-center gap-2 
+         bg-gradient-to-r from-gray-700 to-gray-800 
+         text-white px-5 py-2 rounded-full shadow-md hover:shadow-xl 
+         hover:from-gray-600 hover:to-gray-700 transition duration-200"
+>
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+  </svg>
+  Back
+</button>
+    <div class="bg-gray-900 p-8 rounded-lg shadow-xl w-full max-w-md">
+      <h2 class="text-2xl font-bold text-white text-center mb-4">🔐 Login</h2>
+      <form id="authForm" class="space-y-4">
+        <input type="email" id="email" placeholder="Email" required class="w-full px-4 py-3 rounded bg-gray-800 text-white focus:outline-none">
+        <input type="password" id="password" placeholder="Password" required class="w-full px-4 py-3 rounded bg-gray-800 text-white focus:outline-none">
+        <label class="inline-flex items-center text-sm text-gray-300">
+          <input type="checkbox" id="rememberMe" class="mr-2"> Remember me
+        </label>
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded text-white font-bold">
+          Login
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Main Dashboard Content -->
+  <div id="dashboardContent" class="max-w-6xl mx-auto hidden">
+    <div class="flex justify-between items-center mb-8"> 
+      <div>
+        <h1 class="text-3xl font-bold">📉📈 FOCUS SIGNALS</h1>
+        <p id="userInfo" class="text-sm text-gray-300 mt-1"></p>
+      </div>
+      <div class="flex space-x-3">
+        <button id="logoutBtn" class="flex items-center bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white font-semibold px-5 py-2 rounded-full shadow-lg transform transition duration-200 hover:scale-105">
+  <i data-feather="log-out" class="w-4 h-4 mr-2"></i> Logout
+</button>
+      </div>
+    </div>
+    <hr class="border-gray-600 mb-8">
+
+    <!-- Session Warning -->
+    <div id="sessionWarning" class="bg-yellow-800 border border-yellow-600 text-yellow-200 px-4 py-3 rounded mb-6 hidden">
+      <div class="flex items-center">
+        <i data-feather="alert-triangle" class="w-5 h-5 mr-2"></i>
+        <span>Your session will expire soon. Please refresh to continue.</span>
+      </div>
+    </div>
 
     <div id="signalsList" class="grid md:grid-cols-2 gap-6"></div>
     <p id="lastUpdated" class="text-sm mt-6 text-gray-300 text-center"></p>
   </div>
 
   <script>
-  // Supabase Client
   const client = supabase.createClient(
     "https://addgnnpugkwfhznmegfb.supabase.co",
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkZGdubnB1Z2t3Zmh6bm1lZ2ZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NjEyMTMsImV4cCI6MjA2ODUzNzIxM30.rWwuSAPWhxm-7Ju4CkGzGiFbbOhzzlqFCV4gGTa2DII"
   );
 
-  // Format date nicely
+  let currentUser = null;
+  let sessionCheckInterval = null;
+
+  // AUTH FORM
+  const authForm = document.getElementById('authForm');
+  const loginForm = document.getElementById('loginForm');
+
+  authForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const remember = document.getElementById('rememberMe').checked;
+
+    const { data, error } = await client.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      alert("❌ Login failed: " + error.message);
+      return;
+    }
+
+    currentUser = data.user;
+    if (remember) {
+      localStorage.setItem('rememberUser', 'true');
+    }
+
+    document.getElementById('userInfo').textContent = `Welcome, ${currentUser.email}`;
+    loginForm.classList.add('hidden');
+    showDashboard();
+    fetchSignals();
+  });
+
+  // Auth state listener
+  client.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_OUT') {
+      localStorage.removeItem('rememberUser');
+      showLoginRequired();
+    }
+
+    if (event === 'SIGNED_IN') {
+      currentUser = session.user;
+      if (localStorage.getItem('rememberUser')) {
+        showDashboard();
+        fetchSignals();
+      }
+    }
+
+    if (event === 'TOKEN_REFRESHED') {
+      console.log("🔄 Token refreshed");
+    }
+  });
+
+  async function checkAuth() {
+    const { data: { session }, error } = await client.auth.getSession();
+    if (error || !session || !session.user) {
+      if (localStorage.getItem('rememberUser')) {
+        loginForm.classList.remove('hidden');
+      } else {
+        showLoginRequired();
+      }
+      return false;
+    }
+
+    const now = Date.now() / 1000;
+    const expiry = session.expires_at;
+    const timeUntilExpiry = expiry - now;
+
+    if (timeUntilExpiry < 600) {
+      document.getElementById('sessionWarning').classList.remove('hidden');
+    }
+
+    currentUser = session.user;
+    document.getElementById('userInfo').textContent = `Welcome, ${currentUser.email}`;
+    return true;
+  }
+
+  function showLoginRequired() {
+    document.getElementById('loadingScreen').classList.add('hidden');
+    document.getElementById('dashboardContent').classList.add('hidden');
+    document.getElementById('loginModal').classList.remove('hidden');
+    loginForm.classList.remove('hidden');
+  }
+
+  function showDashboard() {
+    document.getElementById('loadingScreen').classList.add('hidden');
+    document.getElementById('loginModal').classList.add('hidden');
+    document.getElementById('dashboardContent').classList.remove('hidden');
+    loginForm.classList.add('hidden');
+  }
+
+  async function fetchSignals() {
+    const { data: { session } } = await client.auth.getSession();
+    if (!session || !session.user) {
+      showLoginRequired();
+      return;
+    }
+
+    const container = document.getElementById('signalsList');
+    const lastUpdated = document.getElementById('lastUpdated');
+    
+    container.innerHTML = '<div class="col-span-full text-center"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div><p class="mt-2">Loading signals...</p></div>';
+
+    try {
+      const { data, error } = await client
+        .from('signals')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      container.innerHTML = '';
+
+      if (error) {
+        console.error('Fetch error:', error);
+        container.innerHTML = "<div class='col-span-full bg-red-800 p-4 rounded'><p class='text-red-200'>❌ Failed to load signals. Please try again.</p></div>";
+        return;
+      }
+
+      if (data.length === 0) {
+        container.innerHTML = "<div class='col-span-full bg-yellow-800 p-4 rounded'><p class='text-yellow-200'>⚠️ No signals available at this time.</p></div>";
+        return;
+      }
+
+      data.forEach(signal => {
+        const card = document.createElement('div');
+        card.className = 'bg-gray-800 text-white p-5 rounded-lg shadow-lg border border-gray-300 hover:scale-[1.02] transition transform';
+
+        const statusColor = signal.status?.toUpperCase() === "BUY" ? "bg-green-600" :
+                            signal.status?.toUpperCase() === "SELL" ? "bg-red-600" : "bg-yellow-500";
+
+        card.innerHTML = `
+          <div class="flex justify-between items-center mb-2">
+            <h2 class="text-xl font-bold">${signal.pair}</h2>
+            <span class="text-xs px-3 py-1 rounded-full ${statusColor} font-semibold">${signal.status || "PENDING"}</span>
+          </div>
+          <p><strong>Entry:</strong> ${signal.entry}</p>
+          <p><strong>Stop Loss:</strong> ${signal.stop_loss}</p>
+          <p><strong>Take Profit:</strong> ${signal.take_profit}</p>
+          <p class="text-sm mt-2 text-gray-400">📅 Sent: ${formatTime(signal.created_at)} (${timeAgo(signal.created_at)})</p>
+        `;
+
+        container.appendChild(card);
+      });
+
+      lastUpdated.textContent = "🔄 Last updated: " + new Date().toLocaleTimeString();
+      document.getElementById('sessionWarning').classList.add('hidden');
+    } catch (error) {
+      console.error('Network error:', error);
+      container.innerHTML = "<div class='col-span-full bg-red-800 p-4 rounded'><p class='text-red-200'>❌ Network error. Please check your connection.</p></div>";
+    }
+  }
+
   function formatTime(dateString) {
-    const options = {
+    return new Date(dateString).toLocaleString(undefined, {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
       hour: 'numeric',
       minute: '2-digit',
       hour12: true,
-    };
-    return new Date(dateString).toLocaleString(undefined, options);
+    });
   }
 
-  // Time ago format
   function timeAgo(dateString) {
     const seconds = Math.floor((new Date() - new Date(dateString)) / 1000);
-
-    let interval = Math.floor(seconds / 31536000);
-    if (interval >= 1) return interval + "y ago";
-
-    interval = Math.floor(seconds / 2592000);
-    if (interval >= 1) return interval + "mo ago";
-
-    interval = Math.floor(seconds / 86400);
-    if (interval >= 1) return interval + "d ago";
-
-    interval = Math.floor(seconds / 3600);
-    if (interval >= 1) return interval + "h ago";
-
-    interval = Math.floor(seconds / 60);
-    if (interval >= 1) return interval + "m ago";
-
+    const intervals = [
+      { label: 'y', value: 31536000 },
+      { label: 'mo', value: 2592000 },
+      { label: 'd', value: 86400 },
+      { label: 'h', value: 3600 },
+      { label: 'm', value: 60 },
+    ];
+    for (const interval of intervals) {
+      const amount = Math.floor(seconds / interval.value);
+      if (amount >= 1) return `${amount}${interval.label} ago`;
+    }
     return "Just now";
   }
 
-  // Fetch and display signals
-  async function fetchSignals() {
-    const { data, error } = await client
-      .from('signals')
-      .select('*')
-      .order('created_at', { ascending: false });
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await client.auth.signOut();
+    localStorage.removeItem('rememberUser');
+    if (sessionCheckInterval) clearInterval(sessionCheckInterval);
+    window.location.reload();
+  });
 
-    const container = document.getElementById('signalsList');
-    const lastUpdated = document.getElementById('lastUpdated');
-    container.innerHTML = '';
+  document.addEventListener('DOMContentLoaded', async () => {
+  feather.replace();
+  
+  const { data: { session } } = await client.auth.getSession();
+  
+  if (session && session.user && localStorage.getItem('rememberUser')) {
+    currentUser = session.user;
+    document.getElementById('userInfo').textContent = `Welcome, ${currentUser.email}`;
+    showDashboard();
+    fetchSignals();
+    sessionCheckInterval = setInterval(checkAuth, 300000); // every 5 mins
+    setInterval(fetchSignals, 60000); // refresh every 60s
+  } else {
+    document.getElementById('loadingScreen').classList.add('hidden');
+    loginForm.classList.remove('hidden');
+  }
+});
 
-    if (error) {
-      container.innerHTML = "<p class='text-red-400'>❌ Failed to load signals.</p>";
-      return;
+  async function initAuth() {
+    const authenticated = await checkAuth();
+    if (authenticated) {
+      showDashboard();
+      fetchSignals();
+      sessionCheckInterval = setInterval(checkAuth, 300000); // every 5 minutes
+      setInterval(fetchSignals, 30000); // refresh signals every 30s
     }
-
-    if (data.length === 0) {
-      container.innerHTML = "<p class='text-yellow-400'>⚠️ No signals available.</p>";
-      return;
-    }
-
-    data.forEach(signal => {
-      const card = document.createElement('div');
-      card.className = 'bg-gray-800 text-white p-5 rounded-lg shadow-lg border border-gray-300 hover:scale-[1.02] transition transform';
-
-      const statusColor = signal.status?.toUpperCase() === "BUY" ? "bg-green-600" :
-                          signal.status?.toUpperCase() === "SELL" ? "bg-red-600" : "bg-yellow-500";
-
-      card.innerHTML = `
-        <div class="flex justify-between items-center mb-2">
-          <h2 class="text-xl font-bold">${signal.pair}</h2>
-          <span class="text-xs px-3 py-1 rounded-full ${statusColor} font-semibold">${signal.status || "PENDING"}</span>
-        </div>
-        <p><strong>Entry:</strong> ${signal.entry}</p>
-        <p><strong>Stop Loss:</strong> ${signal.stop_loss}</p>
-        <p><strong>Take Profit:</strong> ${signal.take_profit}</p>
-        <p class="text-sm mt-2 text-gray-400">📅 Sent: ${formatTime(signal.created_at)} (${timeAgo(signal.created_at)})</p>
-      `;
-
-      container.appendChild(card);
-    });
-
-    lastUpdated.textContent = "🔄 Last updated: " + new Date().toLocaleTimeString();
   }
 
-  // Initial load + auto refresh
-  fetchSignals();
-  setInterval(fetchSignals, 5000);
-
-  feather.replace();
-</script>
-  <script>
-  // Redirect to index.html on logout
-  document.getElementById('logoutBtn').addEventListener('click', () => {
-    window.location.href = 'index.html'; // Change to your login/home page path
+  window.addEventListener('beforeunload', () => {
+    if (sessionCheckInterval) clearInterval(sessionCheckInterval);
   });
-</script>
+  </script>
 </body>
 </html>
