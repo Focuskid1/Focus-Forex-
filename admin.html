@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin - Manage Signals</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white p-6 min-h-screen">
+  <h1 class="text-3xl font-bold mb-6 text-center">📊 Admin Dashboard - Manage Signals</h1>
+
+  <form id="signalForm" class="space-y-4 max-w-xl mx-auto mb-10">
+    <input type="hidden" id="signalId" />
+    <input type="text" id="pair" placeholder="Pair (e.g. EURUSD)" class="w-full p-3 bg-gray-700 rounded" required />
+    <input type="text" id="entry" placeholder="Entry" class="w-full p-3 bg-gray-700 rounded" required />
+    <input type="text" id="stopLoss" placeholder="Stop Loss" class="w-full p-3 bg-gray-700 rounded" required />
+    <input type="text" id="takeProfit" placeholder="Take Profit" class="w-full p-3 bg-gray-700 rounded" required />
+
+    <!-- Status dropdown -->
+    <select id="status" class="w-full p-3 bg-gray-700 rounded" required>
+      <option value="">Select Status</option>
+      <option value="BUY">BUY</option>
+      <option value="SELL">SELL</option>
+      <option value="PENDING">PENDING</option>
+    </select>
+
+    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 p-3 rounded font-bold">📤 Submit Signal</button>
+    <div id="statusText" class="text-center text-sm mt-2"></div>
+  </form>
+
+  <!-- Signal Table -->
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse table-auto text-sm bg-gray-800 rounded-lg shadow-md">
+      <thead>
+        <tr class="bg-gray-700 text-white">
+          <th class="p-3">Pair</th>
+          <th class="p-3">Entry</th>
+          <th class="p-3">Stop Loss</th>
+          <th class="p-3">Take Profit</th>
+          <th class="p-3">Status</th>
+          <th class="p-3">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="signalList" class="divide-y divide-gray-700"></tbody>
+    </table>
+  </div>
+
+<script>
+  const supabase = window.supabase.createClient(
+    "https://addgnnpugkwfhznmegfb.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkZGdubnB1Z2t3Zmh6bm1lZ2ZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NjEyMTMsImV4cCI6MjA2ODUzNzIxM30.rWwuSAPWhxm-7Ju4CkGzGiFbbOhzzlqFCV4gGTa2DII"
+  );
+
+  const form = document.getElementById("signalForm");
+  const signalList = document.getElementById("signalList");
+  const statusText = document.getElementById("statusText");
+
+  // ✅ Load and display signals
+  async function loadSignals() {
+    const { data, error } = await supabase
+      .from("signals")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    signalList.innerHTML = "";
+
+    if (error) {
+      console.error("❌ Load Error:", error.message);
+      return;
+    }
+
+    data.forEach(signal => {
+      const badgeColor = {
+        BUY: "bg-green-600",
+        SELL: "bg-red-600",
+        PENDING: "bg-yellow-500"
+      }[signal.status] || "bg-gray-500";
+
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td class="p-3 font-bold">${signal.pair}</td>
+        <td class="p-3">${signal.entry}</td>
+        <td class="p-3">${signal.stop_loss}</td>
+        <td class="p-3">${signal.take_profit}</td>
+        <td class="p-3">
+          <span class="px-2 py-1 text-xs rounded-full font-semibold ${badgeColor}">${signal.status || 'N/A'}</span>
+        </td>
+        <td class="p-3 space-x-2">
+          <button class="edit-btn bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded" data-id="${signal.id}">Edit</button>
+          <button class="delete-btn bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded" data-id="${signal.id}">Delete</button>
+        </td>
+      `;
+
+      signalList.prepend(row);
+
+      // ✅ Attach listeners
+      row.querySelector(".edit-btn").addEventListener("click", (e) => {
+        const id = e.target.getAttribute("data-id");
+        editSignal(id);
+      });
+
+      row.querySelector(".delete-btn").addEventListener("click", (e) => {
+        const id = e.target.getAttribute("data-id");
+        deleteSignal(id);
+      });
+    });
+  }
+
+  // ✅ Handle form submit (Create or Update)
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const id = document.getElementById("signalId").value;
+    const pair = document.getElementById("pair").value.trim();
+    const entry = document.getElementById("entry").value.trim();
+    const stop_loss = document.getElementById("stopLoss").value.trim();
+    const take_profit = document.getElementById("takeProfit").value.trim();
+    const status = document.getElementById("status").value.trim();
+
+    let response;
+    if (id) {
+      response = await supabase
+        .from("signals")
+        .update({ pair, entry, stop_loss, take_profit, status })
+        .eq("id", id);
+    } else {
+      response = await supabase
+        .from("signals")
+        .insert([{ pair, entry, stop_loss, take_profit, status }]);
+    }
+
+    const { error } = response;
+    if (error) {
+      statusText.textContent = "❌ Failed: " + error.message;
+      statusText.className = "text-red-400 text-center";
+    } else {
+      statusText.textContent = "✅ Signal saved successfully!";
+      statusText.className = "text-green-400 text-center";
+      form.reset();
+      document.getElementById("signalId").value = "";
+      loadSignals();
+    }
+  });
+
+  // ✅ Delete signal
+ async function deleteSignal(id) {
+  if (confirm("Are you sure you want to delete this signal?")) {
+    const { error } = await supabase
+      .from("signals")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      alert("❌ Delete failed: " + error.message);
+    } else {
+      loadSignals(); // reload updated signals
+    }
+  }
+}
+
+  // ✅ Edit signal
+  async function editSignal(id) {
+    const { data, error } = await supabase
+      .from("signals")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (data) {
+      document.getElementById("signalId").value = data.id;
+      document.getElementById("pair").value = data.pair;
+      document.getElementById("entry").value = data.entry;
+      document.getElementById("stopLoss").value = data.stop_loss;
+      document.getElementById("takeProfit").value = data.take_profit;
+      document.getElementById("status").value = data.status;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      console.error("Edit fetch failed:", error?.message);
+    }
+  }
+
+  // ✅ Load signals on page load
+  loadSignals();
+</script>
+</body>
+</html>

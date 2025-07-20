@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Forex Signals Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-900 to-indigo-900 min-h-screen text-white p-6">
+    
+  <div class="max-w-6xl mx-auto">
+      
+    <div class="flex justify-between items-center mb-8"> 
+      <h1 class="text-3xl font-bold">📉📈 FOCUS SIGNALS</h1>
+      <button id="logoutBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold px-2 py-2 rounded">
+        Logout
+      </button>
+    </div>
+    <hr><br>
+
+    <div id="signalsList" class="grid md:grid-cols-2 gap-6"></div>
+    <p id="lastUpdated" class="text-sm mt-6 text-gray-300 text-center"></p>
+  </div>
+
+  <script>
+  // Supabase Client
+  const client = supabase.createClient(
+    "https://addgnnpugkwfhznmegfb.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkZGdubnB1Z2t3Zmh6bm1lZ2ZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NjEyMTMsImV4cCI6MjA2ODUzNzIxM30.rWwuSAPWhxm-7Ju4CkGzGiFbbOhzzlqFCV4gGTa2DII"
+  );
+
+  // Format date nicely
+  function formatTime(dateString) {
+    const options = {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    };
+    return new Date(dateString).toLocaleString(undefined, options);
+  }
+
+  // Time ago format
+  function timeAgo(dateString) {
+    const seconds = Math.floor((new Date() - new Date(dateString)) / 1000);
+
+    let interval = Math.floor(seconds / 31536000);
+    if (interval >= 1) return interval + "y ago";
+
+    interval = Math.floor(seconds / 2592000);
+    if (interval >= 1) return interval + "mo ago";
+
+    interval = Math.floor(seconds / 86400);
+    if (interval >= 1) return interval + "d ago";
+
+    interval = Math.floor(seconds / 3600);
+    if (interval >= 1) return interval + "h ago";
+
+    interval = Math.floor(seconds / 60);
+    if (interval >= 1) return interval + "m ago";
+
+    return "Just now";
+  }
+
+  // Fetch and display signals
+  async function fetchSignals() {
+    const { data, error } = await client
+      .from('signals')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    const container = document.getElementById('signalsList');
+    const lastUpdated = document.getElementById('lastUpdated');
+    container.innerHTML = '';
+
+    if (error) {
+      container.innerHTML = "<p class='text-red-400'>❌ Failed to load signals.</p>";
+      return;
+    }
+
+    if (data.length === 0) {
+      container.innerHTML = "<p class='text-yellow-400'>⚠️ No signals available.</p>";
+      return;
+    }
+
+    data.forEach(signal => {
+      const card = document.createElement('div');
+      card.className = 'bg-gray-800 text-white p-5 rounded-lg shadow-lg border border-gray-300 hover:scale-[1.02] transition transform';
+
+      const statusColor = signal.status?.toUpperCase() === "BUY" ? "bg-green-600" :
+                          signal.status?.toUpperCase() === "SELL" ? "bg-red-600" : "bg-yellow-500";
+
+      card.innerHTML = `
+        <div class="flex justify-between items-center mb-2">
+          <h2 class="text-xl font-bold">${signal.pair}</h2>
+          <span class="text-xs px-3 py-1 rounded-full ${statusColor} font-semibold">${signal.status || "PENDING"}</span>
+        </div>
+        <p><strong>Entry:</strong> ${signal.entry}</p>
+        <p><strong>Stop Loss:</strong> ${signal.stop_loss}</p>
+        <p><strong>Take Profit:</strong> ${signal.take_profit}</p>
+        <p class="text-sm mt-2 text-gray-400">📅 Sent: ${formatTime(signal.created_at)} (${timeAgo(signal.created_at)})</p>
+      `;
+
+      container.appendChild(card);
+    });
+
+    lastUpdated.textContent = "🔄 Last updated: " + new Date().toLocaleTimeString();
+  }
+
+  // Initial load + auto refresh
+  fetchSignals();
+  setInterval(fetchSignals, 5000);
+
+  feather.replace();
+</script>
+  <script>
+  // Redirect to index.html on logout
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    window.location.href = 'index.html'; // Change to your login/home page path
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Focus Forex- Professional Forex Trading Services</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        }
+        .text-gradient {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hover-scale {
+            transition: transform 0.3s ease;
+        }
+        .hover-scale:hover {
+            transform: scale(1.05);
+        }
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+        .mobile-mockup {
+            background: #000;
+            border-radius: 30px;
+            padding: 20px;
+            position: relative;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        .mobile-screen {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            border-radius: 20px;
+            padding: 20px;
+            color: white;
+        }
+        @media (max-width: 768px) {
+            .hero-text {
+                font-size: 2.5rem;
+            }
+            .chart-container {
+                height: 300px;
+            }
+        }
+        .ceo{
+            border-radius: 100%;
+        }
+    </style>
+    <style>
+/* Default Bar Transition */
+#toggleMenu .bar {
+  transition: all 0.4s ease-in-out;
+}
+
+/* When active, transform into X */
+#toggleMenu.active .bar:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+#toggleMenu.active .bar:nth-child(2) {
+  opacity: 0;
+}
+
+#toggleMenu.active .bar:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+</style>
+<style>
+    /* Hero */
+.hero1 {
+  background-image: url('hero.jpg');
+  background-size: cover;
+  background-position: center;
+  padding: 120px 20px;
+  text-align: center;
+  position: relative;
+}
+
+.hero1::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+}
+
+.hero1-content {
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+  margin: auto;
+}
+
+.hero1 h1 {
+  font-size: 2.2em;
+  margin-bottom: 15px;
+  font-weight: 800;
+  color: #df9338;
+}
+
+.hero1 p {
+  font-size: 1em;
+  margin-bottom: 25px;
+  line-height: 1.5;
+  color: #f3f3df;
+}
+
+</style>
+</head>
+<body class="bg-gray-50">
+
+<!-- Navigation -->
+<nav class="bg-white shadow-lg fixed w-full z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between h-16 items-center">
+      <div class="text-2xl font-bold text-gradient flex items-center">
+        <i class="fas fa-chart-line mr-2"></i>FOCUS FOREX 
+      </div>
+
+<!-- Animated Hamburger Button -->
+<button id="toggleMenu" class="md:hidden flex flex-col justify-between w-8 h-6 z-50 relative">
+  <span class="bar block h-1 w-full bg-black rounded transition-transform duration-700 ease-in-out origin-center"></span>
+  <span class="bar block h-1 w-full bg-black rounded transition-opacity duration-500 ease-in-out"></span>
+  <span class="bar block h-1 w-full bg-black rounded transition-transform duration-700 ease-in-out origin-center"></span>
+</button>
+      <!-- Desktop menu -->
+      <ul class="hidden md:flex space-x-6 items-center">
+        <li><a href="#services" class="text-gray-700 hover:text-red-600 px-3 py-2">Services</a></li>
+        <li><a href="#performance" class="text-gray-700 hover:text-red-600 px-3 py-2">Performance</a></li>
+        <li><a href="#about" class="text-gray-700 hover:text-red-600 px-3 py-2">About</a></li>
+        <li><a href="#contact" class="text-gray-700 hover:text-red-600 px-3 py-2">Contact</a></li>
+        <button 
+  class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700"
+  onclick="window.location.href='login.html'"
+>
+  Client Portal
+</button>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile menu -->
+<div id="mobileMenu"
+     class="fixed top-16 right-0 w-0 overflow-hidden h-full bg-white z-50 transition-all duration-300 ease-in-out md:hidden shadow-lg">
+  <div class="w-[90%] max-w-xs h-full p-6 relative">
+    
+    <ul class="flex flex-col space-y-6 mt-12">
+      <li><a href="#services" class="text-gray-700 hover:text-red-600">Services</a></li><br>
+      <li><a href="#performance" class="text-gray-700 hover:text-red-600">Performance</a></li><br>
+      <li><a href="#about" class="text-gray-700 hover:text-red-600">About</a></li><br>
+      <li><a href="#contact" class="text-gray-700 hover:text-red-600">Contact</a></li><br>
+        <button class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700" onclick="window.location.href='login.html'">
+        Client Portal
+      </button>
+    </ul>
+  </div>
+</div>
+<!-- Hero1 Section -->
+  <section class="hero1">
+    <div class="hero1-content">
+      <h1>FOREX TRADERS KNOW BEST</h1>
+      <p>We were voted 1st overall Traders in Nigeria  – not because we're the biggest, but because we're the best.</p>
+      <br>
+      <button class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700" onclick="window.location.href='login.html'">
+        Client Portal
+      </button>
+    </div>
+  </section>
+    <!-- Hero Section -->
+    <section class="gradient-bg text-white pt-24 pb-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <div class="bg-gray-800 rounded-lg p-6 mb-8 max-w-4xl mx-auto">
+                    <p class="text-gray-300 mb-4">
+                        <i class="fas fa-trophy text-yellow-500 mr-2"></i>
+                        <strong>Award-Winning Trader</strong> — Recognized by ForexTradingAwards.com as Top Independent Trader 2024. 
+                        Delivering consistent profits through advanced algorithmic trading and risk management.
+                    </p>
+                </div>
+
+                <h1 class="hero-text text-6xl font-bold mb-6">
+                    FOCUS TRADING.<br>
+                    <span class="text-gradient">PROVEN RESULTS.</span>
+                </h1>
+                
+                <p class="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+                    Professional forex trading services with 87.2% win rate starting from just 2% management fee. 
+                    Access to expert trading signals 24/7. Value for all clients, regardless of portfolio size.
+                </p>
+
+                <button class="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg text-lg font-semibold" onclick="window.location.href='login.html'">
+                    START TRADING WITH ME
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Metrics -->
+    <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div class="hover-scale">
+                    <div class="text-5xl font-bold text-gray-900 mb-2">87.2<span class="text-red-600">%</span></div>
+                    <div class="text-gray-600">win rate</div>
+                </div>
+                <div class="hover-scale">
+                    <div class="text-5xl font-bold text-gray-900 mb-2">15<span class="text-red-600">ms</span></div>
+                    <div class="text-gray-600">avg execution speed</div>
+                </div>
+                <div class="hover-scale">
+                    <div class="text-5xl font-bold text-gray-900 mb-2">5<span class="text-red-600">+</span></div>
+                    <div class="text-gray-600">years experience</div>
+                </div>
+                <div class="hover-scale">
+                    <div class="text-5xl font-bold text-gray-900 mb-2">2<span class="text-red-600">%</span></div>
+                    <div class="text-gray-600">min. management fee</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Awards Section -->
+    <section class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">AWARD-WINNING PERFORMANCE</h2>
+                <p class="text-xl text-gray-600">
+                    Recognized by ForexTradingAwards.com as #1 Independent Trader for consistent performance and client satisfaction.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-8 rounded-lg shadow-lg text-center hover-scale">
+                    <div class="w-20 h-20 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-trophy text-white text-2xl"></i>
+                    </div>
+                    <div class="text-blue-600 font-bold mb-2">#1</div>
+                    <div class="font-bold text-lg">Independent Trader</div>
+                    <div class="text-sm text-gray-500">2025</div>
+                </div>
+
+                <div class="bg-white p-8 rounded-lg shadow-lg text-center hover-scale">
+                    <div class="w-20 h-20 bg-gradient-to-r from-blue-500 to-blue-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-star text-white text-2xl"></i>
+                    </div>
+                    <div class="text-blue-600 font-bold mb-2">#1</div>
+                    <div class="font-bold text-lg">Client Satisfaction</div>
+                    <div class="text-sm text-gray-500">2025</div>
+                </div>
+
+                <div class="bg-white p-8 rounded-lg shadow-lg text-center hover-scale">
+                    <div class="w-20 h-20 bg-gradient-to-r from-green-500 to-green-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-chart-line text-white text-2xl"></i>
+                    </div>
+                    <div class="text-blue-600 font-bold mb-2">#1</div>
+                    <div class="font-bold text-lg">Performance</div>
+                    <div class="text-sm text-gray-500">2025</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-5xl font-bold text-gray-900 mb-6">MY SERVICES. YOUR SUCCESS.</h2>
+                <p class="text-xl text-gray-600">Comprehensive trading services designed to maximize your forex trading potential.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-gray-50 p-8 rounded-lg hover-scale">
+                    <div class="text-red-600 mb-4">
+                        <i class="fas fa-signal text-4xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Premium Trading Signals</h3>
+                    <ul class="space-y-2 text-gray-600">
+                        <li><i class="fas fa-check text-green-600 mr-2"></i>Real-time market analysis</li>
+                        <li><i class="fas fa-check text-green-600 mr-2"></i>Entry and exit points</li>
+                        <li><i class="fas fa-check text-green-600 mr-2"></i>Risk management guidance</li>
+                        <li><i class="fas fa-check text-green-600 mr-2"></i>24/5 signal delivery</li>
+                    </ul>
+                </div>
+
+                <div class="bg-gray-50 p-8 rounded-lg hover-scale">
+                    <div class="text-red-600 mb-4">
+                        <i class="fas fa-briefcase text-4xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Portfolio Management</h3>
+                    <ul class="space-y-2 text-gray-600">
+                        <li><i class="fas fa-check text-green-600 mr-2"></i>Professional account management</li>
+                        <li><i class="fas fa-check text-green-600 mr-2"></i>Customized trading strategies</li>
+                        <li><i class="fas fa-check text-green-600 mr-2"></i>Monthly performance reports</li>
+                        <li><i class="fas fa-check text-green-600 mr-2"></i>Direct trader communication</li>
+                    </ul>
+                </div>
+
+                <div class="bg-gray-50 p-8 rounded-lg hover-scale">
+                    <div class="text-red-600 mb-4">
+                        <i class="fas fa-graduation-cap text-4xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Trading Education</h3>
+                    <ul class="space-y-2 text-gray-600">
+                        <li><i class="fas fa-check text-green-600 mr-2"></i>One-on-one mentoring</li>
+                        <li><i class="fas fa-check text-green-600 mr-2"></i>Live trading sessions</li>
+                        <li><i class="fas fa-check text-green-600 mr-2"></i>Strategy development</li>
+                        <li><i class="fas fa-check text-green-600 mr-2"></i>Risk management training</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="text-center mt-12">
+                <button class="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg text-lg font-semibold" onclick="window.location.href='login.html'">
+                    EXPLORE MY SERVICES
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technology Section -->
+    <section class="gradient-bg text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h2 class="text-5xl font-bold mb-8">ADVANCED TRADING TECHNOLOGY</h2>
+                    <p class="text-xl text-gray-300 mb-8">
+                        Trade with confidence using cutting-edge technology. Lightning-fast execution with institutional-grade infrastructure.
+                    </p>
+
+                    <div class="space-y-6">
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 text-2xl mr-4"></i>
+                            <span class="text-lg">Advanced algorithmic trading systems</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 text-2xl mr-4"></i>
+                            <span class="text-lg">Real-time market data and analysis</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 text-2xl mr-4"></i>
+                            <span class="text-lg">Multi-platform trading access</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mobile-mockup">
+                    <div class="mobile-screen">
+                        <div class="text-center mb-4">
+                            <div class="text-sm text-gray-400">12:11</div>
+                            <div class="flex justify-end space-x-1 text-xs">
+                                <i class="fas fa-signal"></i>
+                                <i class="fas fa-wifi"></i>
+                                <i class="fas fa-battery-full"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="text-sm text-gray-400">EUR/USD (-)</div>
+                            <div class="text-2xl font-bold">1.08520</div>
+                        </div>
+
+                        <div class="bg-gray-800 rounded p-4 mb-4">
+                            <div class="h-32 bg-gradient-to-t from-green-900 to-green-600 rounded flex items-end justify-center">
+                                <div class="text-xs text-center">
+                                    <div class="w-full h-16 bg-green-500 rounded-t mb-1"></div>
+                                    <div>Chart View</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 mb-4">
+                            <button class="bg-red-600 py-2 rounded text-sm">SELL</button>
+                            <button class="bg-green-600 py-2 rounded text-sm">BUY</button>
+                        </div>
+
+                        <div class="text-xs text-gray-400 text-center">
+                            ✅ Price 1.08496 Size Sell 1 Lot(s) Status Open
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Performance Section -->
+    <section id="performance" class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">PROVEN TRACK RECORD</h2>
+                <p class="text-xl text-gray-600">Consistent performance over 5+ years of professional trading</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-xl font-bold mb-4">Monthly Performance (2024)</h3>
+                    <div class="chart-container">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-xl font-bold mb-4">Win Rate Distribution</h3>
+                    <div class="chart-container">
+                        <canvas id="winRateChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+                    <div class="text-3xl font-bold text-green-600 mb-2">+284.7%</div>
+                    <div class="text-gray-600">Total Return (2025)</div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+                    <div class="text-3xl font-bold text-blue-600 mb-2">1.47</div>
+                    <div class="text-gray-600">Sharpe Ratio</div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+                    <div class="text-3xl font-bold text-purple-600 mb-2">-8.2%</div>
+                    <div class="text-gray-600">Max Drawdown</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="bg-black text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-5xl font-bold mb-6">READY TO ELEVATE YOUR TRADING?</h2>
+                <p class="text-xl text-gray-300 mb-8">
+                    Join successful traders who trust Focus Forex team for their trading success.
+                </p>
+
+                <div class="space-y-4 mb-8">
+                    <div class="flex items-center justify-center">
+                        <i class="fas fa-check-circle text-green-500 text-xl mr-3"></i>
+                        <span class="text-lg">Free consultation and strategy assessment</span>
+                    </div>
+                    <div class="flex items-center justify-center">
+                        <i class="fas fa-check-circle text-green-500 text-xl mr-3"></i>
+                        <span class="text-lg">Start with as little as $5,000 managed account</span>
+                    </div>
+                    <div class="flex items-center justify-center">
+                        <i class="fas fa-check-circle text-green-500 text-xl mr-3"></i>
+                        <span class="text-lg">30-day money-back guarantee</span>
+                    </div>
+                </div>
+
+                <button class="bg-red-600 hover:bg-red-700 text-white px-12 py-4 rounded-lg text-xl font-semibold" onclick="window.location.href='login.html'">
+                    GET STARTED TODAY
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h2 class="text-4xl font-bold text-gray-900 mb-6">ABOUT FOCUS FOREX</h2>
+                    <p class="text-lg text-gray-600 mb-6">
+                        With over 5 years of professional trading experience, I've developed and refined trading strategies 
+                        that have consistently delivered exceptional returns for my clients. My approach combines technical 
+                        analysis, fundamental research, and advanced risk management techniques.
+                    </p>
+                    <p class="text-lg text-gray-600 mb-8">
+                        I believe in transparency, which is why all performance metrics are verified and updated in real-time. 
+                        Every client receives personalized attention and strategies tailored to their risk tolerance and financial goals.
+                    </p>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 bg-red-600 rounded-full mr-4"></div>
+                            <span>CFA Charter Holder</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 bg-red-600 rounded-full mr-4"></div>
+                            <span>Series 7 & 66 Licensed</span>
+  </div>
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 bg-red-600 rounded-full mr-4"></div>
+                            <span>Risk Management Certified</span>
+                        </div>
+                    </div>
+                </div> 
+                <div class="bg-gray-50 p-8 rounded-lg">
+                    <div class="text-center mb-6">
+                        <div class="w-32 h-32 bg-gray-300 rounded-full mx-auto mb-4 flex items-center justify-center">
+                       <img src="ceo.jpg" alt="CEO" class="ceo"></img>    
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900">Edomani Chibuike</h3>
+                        <p class="text-gray-600">Senior Forex Trader & Portfolio Manager</p>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex justify-between">
+                            <span class="font-semibold">Experience:</span>
+                            <span>5+ Years</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-semibold">Specialty:</span>
+                            <span>Currency Pairs</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-semibold">Education:</span>
+                            <span>MBA Finance</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-semibold">Clients:</span>
+                            <span>500+ Worldwide</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="gradient-bg text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-4">GET IN TOUCH</h2>
+                <p class="text-xl text-gray-300">Ready to start your journey to trading success?</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div>
+                    <h3 class="text-2xl font-bold mb-6">Contact Information</h3>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-center">
+                            <i class="fas fa-phone text-red-500 text-xl mr-4"></i>
+                            <div>
+                                <div class="font-semibold">Phone</div>
+                                <div class="text-gray-300">+234 706 1400 188</div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center">
+                            <i class="fas fa-envelope text-red-500 text-xl mr-4"></i>
+                            <div>
+                                <div class="font-semibold">Email</div>
+                                <div class="text-gray-300">chibuikeedomani@gmail.com</div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center">
+                            <i class="fas fa-map-marker-alt text-red-500 text-xl mr-4"></i>
+                            <div>
+                                <div class="font-semibold">Location</div>
+                                <div class="text-gray-300">FCT, Nigeria</div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center">
+                            <i class="fas fa-clock text-red-500 text-xl mr-4"></i>
+                            <div>
+                                <div class="font-semibold">Trading Hours</div>
+                                <div class="text-gray-300">24/5 Market Coverage</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8">
+                        <h4 class="font-semibold mb-4">Follow Me</h4>
+                        <div class="flex space-x-4">
+                            <a href="https://wa.me/+2347061400188?text=Hello%20Sir%2C%20I%27m%20interested%20in%20the%20Forex%20Mentorship.%20Can%20you%20please%20provide%20more%20details%3F" class="text-gray-300 hover:text-red-500 text-2xl">
+                                <i class="fa-brands fa-whatsapp"></i>
+                      </a>
+                            <a href="tiktok.com/@focus.forex" class="text-gray-300 hover:text-red-500 text-2xl">
+                                <i class="fa-brands fa-tiktok"></i>
+                            </a>
+                            <a href="https://www.facebook.com/Metafocus1" class="text-gray-300 hover:text-red-500 text-2xl">
+                                <i class="fa-brands fa-facebook-f"></i>
+                            </a>
+                    
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-800 p-8 rounded-lg">
+                    <h3 class="text-2xl font-bold mb-6">Send a Message</h3>
+                    <form class="space-y-6" id="contact-form">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Full Name</label>
+                            <input type="text" class="w-full px-4 py-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:border-red-500 focus:outline-none" name="name">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Email Address</label>
+                            <input type="email" name="email" class="w-full px-4 py-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:border-red-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Investment Amount</label>
+                            <select class="w-full px-4 py-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:border-red-500 focus:outline-none" name="select">
+                                <option>$100 - $1,000</option>
+                                <option>$1,000 - $50,000</option>
+                                <option>$50,000 - $100,000</option>
+                                <option>$100+</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Message</label>
+                            <textarea rows="4" class="w-full px-4 py-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:border-red-500 focus:outline-none" placeholder="Tell me about your trading goals..." name="message"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg font-semibold">
+                            Send Message
+                        </button>
+                    </form>
+                            </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="text-2xl font-bold text-gradient mb-4">
+                        <i class="fas fa-chart-line mr-2"></i>FOCUS FOREX 
+                    </div>
+                    <p class="text-gray-400 mb-4">
+                        Professional forex trading services with proven results and transparent performance tracking.
+                    </p>
+                    <div class="flex space-x-4">
+                         <a href="https://wa.me/+2347061400188?text=Hello%20Sir%2C%20I%27m%20interested%20in%20the%20Forex%20Mentorship.%20Can%20you%20please%20provide%20more%20details%3F" class="text-gray-300 hover:text-red-500 text-1.2xl">
+                                <i class="fa-brands fa-whatsapp"></i>
+                      </a>
+                            <a href="tiktok.com/@focus.forex" class="text-gray-300 hover:text-red-500 text-1.2xl">
+                                <i class="fa-brands fa-tiktok"></i>
+                            </a>
+                            <a href="https://www.facebook.com/Metafocus1" class="text-gray-300 hover:text-red-500 text-1.2xl">
+                                <i class="fa-brands fa-facebook-f"></i>
+                            </a>
+                    
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="font-bold mb-4">Services</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white">Trading Signals</a></li>
+                        <li><a href="#" class="hover:text-white">Portfolio Management</a></li>
+                        <li><a href="#" class="hover:text-white">Trading Education</a></li>
+                        <li><a href="#" class="hover:text-white">Risk Management</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="font-bold mb-4">Resources</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white">Market Analysis</a></li>
+                        <li><a href="#" class="hover:text-white">Trading Blog</a></li>
+                        <li><a href="#" class="hover:text-white">Performance Reports</a></li>
+                        <li><a href="#" class="hover:text-white">Client Portal</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="font-bold mb-4">Legal</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white">Terms of Service</a></li>
+                        <li><a href="#" class="hover:text-white">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-white">Risk Disclosure</a></li>
+                        <li><a href="#" class="hover:text-white">Disclaimers</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-800 mt-12 pt-8">
+                <div class="text-center text-gray-400">
+                    <p class="mb-4">
+                        <strong>Risk Warning:</strong> Trading foreign exchange on margin carries significant risk and may not be suitable for all investors. 
+                        Past performance is not indicative of future results. Please ensure you fully understand the risks involved.
+                    </p>
+                    <p>&copy; 2025 Focus Forex. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script defer src="script.js"></script>
+<script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+</script>
+<script>
+    
+    // Chart: Performance
+    const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+    new Chart(performanceCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [{
+                label: 'Monthly Return (%)',
+                data: [12.5, 8.3, 15.7, 22.1, 18.9, 24.3, 19.8, 21.7, 16.4, 28.2, 25.1, 31.5],
+                borderColor: '#ef4444',
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Chart: Win Rate
+    const winRateCtx = document.getElementById('winRateChart').getContext('2d');
+    new Chart(winRateCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Winning Trades', 'Losing Trades'],
+            datasets: [{
+                data: [87.2, 12.8],
+                backgroundColor: ['#10b981', '#ef4444'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+// Mobile menu toggle with scroll lock and hamburger animation
+document.addEventListener("DOMContentLoaded", function () {
+  const toggleMenu = document.getElementById("toggleMenu");
+  const closeMenu = document.getElementById("closeMenu");
+  const mobileMenu = document.getElementById("mobileMenu");
+  const body = document.body;
+
+  // Open mobile menu
+  function openMenu() {
+    mobileMenu.style.width = "50%";
+    body.classList.add("overflow-hidden");
+    toggleMenu.classList.add("active"); // Triggers hamburger to X animation
+  }
+
+  // Close mobile menu
+  function closeMenuFn() {
+    mobileMenu.style.width = "0";
+    body.classList.remove("overflow-hidden");
+    toggleMenu.classList.remove("active"); // Resets hamburger icon
+  }
+
+    // Toggle mobile menu
+    toggleMenu.addEventListener("click", () => {
+      const isOpen = mobileMenu.style.width === "50%";
+      isOpen ? closeMenuFn() : openMenu();
+    });
+
+  });
+  
+
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    });
+  });
+
+  // Add blur and background to navbar on scroll
+  window.addEventListener('scroll', function () {
+    const navbar = document.querySelector('nav');
+    if (window.scrollY > 100) {
+      navbar.classList.add('backdrop-blur-md', 'bg-white/90');
+    } else {
+      navbar.classList.remove('backdrop-blur-md', 'bg-white/90');
+    }
+  });
+
+
+  (function(){
+    emailjs.init("elVmbl2cIlOxIy16Q"); // Replace with your actual Public Key
+  })();
+
+  document.getElementById('contact-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    emailjs.sendForm('service_z4eplla', 'template_v5lqslp', this)
+      .then(function(response) {
+        alert("Message sent successfully!");
+      }, function(error) {
+        alert("Failed to send. Please try again.");
+        console.log(error);
+      });
+  });
+</script>
+
+</body>
+</html>
