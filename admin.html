@@ -98,21 +98,20 @@
 
    
   </div>
-
-  <script>
+ <script>
     const client = supabase.createClient(
       "https://addgnnpugkwfhznmegfb.supabase.co",
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkZGdubnB1Z2t3Zmh6bm1lZ2ZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NjEyMTMsImV4cCI6MjA2ODUzNzIxM30.rWwuSAPWhxm-7Ju4CkGzGiFbbOhzzlqFCV4gGTa2DII"
     );
-    const ADMIN_EMAIL = "chibuikeedomani@gmail.com"; // Change to your admin
+    const ADMIN_EMAILS = ["chibuikeedomani@gmail.com", "digitalmedia080@gmail.com"]; // List of allowed admins
 
-    let sessionInterval;
-    const loading = document.getElementById("loadingScreen");
-    const loginModal = document.getElementById("loginModal");
-    const adminContent = document.getElementById("adminContent");
-    const authForm = document.getElementById("authForm");
+let sessionInterval;
+const loading = document.getElementById("loadingScreen");
+const loginModal = document.getElementById("loginModal");
+const adminContent = document.getElementById("adminContent");
+const authForm = document.getElementById("authForm");
 
-    authForm.addEventListener("submit", async e => {
+authForm.addEventListener("submit", async e => {
   e.preventDefault();
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
@@ -123,7 +122,7 @@
   if (res.error) return alert("Login error: " + res.error.message);
 
   const userEmail = res.data.user?.email;
-  if (userEmail !== ADMIN_EMAIL) {
+  if (!ADMIN_EMAILS.includes(userEmail)) {
     await client.auth.signOut();
     return alert("❌ Not authorized");
   }
@@ -132,34 +131,34 @@
   showAdmin();
 });
 
-    client.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_OUT") {
-        localStorage.removeItem("rememberUser");
-        showLogin();
-      }
-    });
+client.auth.onAuthStateChange((event, session) => {
+  if (event === "SIGNED_OUT") {
+    localStorage.removeItem("rememberUser");
+    showLogin();
+  }
+});
 
-    async function checkAuth() {
-      const { data: { session } } = await client.auth.getSession();
-      if (!session?.user || session.user.email !== ADMIN_EMAIL) {
-        showLogin();
-        return false;
-      }
-      return true;
-    }
+async function checkAuth() {
+  const { data: { session } } = await client.auth.getSession();
+  if (!session?.user || !ADMIN_EMAILS.includes(session.user.email)) {
+    showLogin();
+    return false;
+  }
+  return true;
+}
 
-    function showLogin() {
-      loading.classList.add("hidden");
-      adminContent.classList.add("hidden");
-      loginModal.classList.remove("hidden");
-    }
-    function showAdmin() {
-      loading.classList.add("hidden");
-      loginModal.classList.add("hidden");
-      adminContent.classList.remove("hidden");
-      initAdmin();
-    }
+function showLogin() {
+  loading.classList.add("hidden");
+  adminContent.classList.add("hidden");
+  loginModal.classList.remove("hidden");
+}
 
+function showAdmin() {
+  loading.classList.add("hidden");
+  loginModal.classList.add("hidden");
+  adminContent.classList.remove("hidden");
+  initAdmin();
+}
     document.getElementById("logoutBtn").addEventListener("click", async () => {
       await client.auth.signOut();
       clearInterval(sessionInterval);
@@ -298,5 +297,7 @@ const exactDate = createdAt.toLocaleString(undefined, options);
       await loadSignals();
       }
   </script>
+
+
 </body>
 </html>
